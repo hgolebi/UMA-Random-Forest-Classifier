@@ -4,8 +4,9 @@ from collections import Counter
 import math
 
 class Node:
-    def __init__(self, attr_id = None):
-        self.attribute_index = attr_id
+    def __init__(self, value = None):
+        self.value = value  # Jezeli wezel ma dzieci, to value = indeks atrybutu decyzyjnego,
+                            # jesli nie ma dzieci, to value = klasa    
         self.children = {}
 
     def addChild(self, attribute_value, child_node):
@@ -49,11 +50,10 @@ class Classifier:
 
     def entropy(self, list):
         entropy = 0
-        class_column = [row[0] for row in list]
+        class_column = [row[0] for row in list] 
         for class_, count in Counter(class_column).items():
-            if count != 0:
-                class_probability = count / len(list)
-                entropy -= class_probability * math.log(class_probability)
+            class_probability = count / len(list)
+            entropy -= class_probability * math.log(class_probability)
         return entropy
 
 
@@ -75,16 +75,16 @@ class Classifier:
     def classify(self, object):
         curr_node = self.root
         while curr_node.children:
-            attr_index = curr_node.attribute_index
+            attr_index = curr_node.value
             attr_value = object[attr_index]
             curr_node = curr_node.children[attr_value]
-        return curr_node.attribute_index
+        return curr_node.value
 
     def recursive_test(self, node):
         if not node.children:
             return True
 
-        attr_values = self.dataset.attributes[node.attribute_index]
+        attr_values = self.dataset.attributes[node.value]
 
         if len(node.children) != len(attr_values):
             return False
