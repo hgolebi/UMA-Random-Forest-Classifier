@@ -1,4 +1,4 @@
-from classifier import Classifier
+from classifier import Classifier, RandomForest
 from dataset import Dataset
 
 
@@ -12,7 +12,8 @@ DATA = data1
 CLASS = class1
 
 d = Dataset(DATA)
-c = Classifier(d)
+# c = Classifier(d)
+c = RandomForest(d, 10)
 
 tp = 0
 tn = 0
@@ -40,7 +41,7 @@ for elem in d.test_set:
 acc = (tp + tn) / len(d.test_set) * 100
 
 print("Tested data: ", DATA)
-print("Test: ", c.test())
+# print("Test: ", c.test())
 print("True Positive: ", tp)
 print("True Negative: ", tn)
 print("False Positive: ", fp)

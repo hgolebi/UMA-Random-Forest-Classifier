@@ -102,7 +102,17 @@ class Classifier:
         return self.recursive_test(self.root)
 
 
-
-
+class RandomForest:
+    def __init__(self, dataset, count):
+        self.dataset = dataset
+        self.count = count
+        self.trees = []
+        for i in range(count):
+            self.trees.append(Classifier(dataset))
+        
+    def classify(self, object):
+        decisions = [tree.classify(object) for tree in self.trees]
+        counter = Counter(decisions)
+        return counter.most_common(1)[0][0]
 
 
