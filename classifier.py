@@ -26,22 +26,19 @@ class Classifier:
         if len(attribute_index_list) < 1:
             raise(Exception)
 
+        class_column = [row[0] for row in data]
+        
         # Sprawdzamy, czy w zbiorze została tylko 1 klasa
-        only_class = data[0][0]
-        for elem in data:
-            if elem[0] != only_class:
-                only_class = None
-                break
-        if not only_class is None:
-            return Node(only_class)
+        if all([elem == class_column[0] for elem in class_column]):
+            return Node(class_column[0])
 
         # Jeżeli nie ma już atrybutów, zwracamy najczęstszą klasę
         if len(attribute_index_list) == 1:
-            class_column = [row[0] for row in data]
             counter = Counter(class_column)
             best_class = counter.most_common(1)[0][0]
             return Node(best_class)
 
+        # Wybieramy najlepszy atrybut, i tworzymy dla niego nowy węzeł decyzyjny
         attr_id = self.bestAttribute(data, attribute_index_list)
         attribute_index_list.remove(attr_id)
         node = Node(attr_id)
@@ -52,14 +49,12 @@ class Classifier:
 
     def entropy(self, list, class_set):
         entropy = 0
-        for clas in class_set:
-            class_count = 0
-            for elem in list:
-                if elem[0] == clas:
-                    class_count += 1
-            if class_count != 0:
-                class_prob = class_count / len(list)
-                entropy -= class_prob * math.log(class_prob)
+        class_column = [row[0] for row in list]
+        for class_, count in Counter(class_column).items():
+            if count != 0:
+                class_probability = count / len(list)
+                entropy -= class_probability * math.log(class_probability)
+
         return entropy
 
 
