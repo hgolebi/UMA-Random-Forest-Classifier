@@ -1,5 +1,6 @@
 from reprlib import recursive_repr
 from dataset import Dataset
+from collections import Counter
 import math
 
 class Node:
@@ -34,25 +35,22 @@ class Classifier:
         if not only_class is None:
             return Node(only_class)
 
-
+        # Jeżeli nie ma już atrybutów, zwracamy najczęstszą klasę
         if len(attribute_index_list) == 1:
-            class_count_list = []
-            for class_ in self.dataset.attributes[0]:
-                class_column = [row[0] for row in data] 
-                count = class_column.count(class_)
-                class_count_list.append((class_, count))
-            best_class = max(class_count_list, key=lambda x: x[1])
+            class_column = [row[0] for row in data]
+            counter = Counter(class_column)
+            best_class = counter.most_common(1)[0][0]
             return Node(best_class[0])
 
         attr_id = self.bestAttribute(data, attribute_index_list)
         attribute_index_list.remove(attr_id)
         node = Node(attr_id)
-        for value in self.dataset.attributes[attr_id]:
+        for attr_value in self.dataset.attributes[attr_id]:
             new_data = []
-            for elem in data:
-                if elem[attr_id] == value:
-                    new_data.append(elem)
-            node.addChild(value, self.train(new_data, attribute_index_list))
+            for row in data:
+                if row[attr_id] == attr_value:
+                    new_data.append(row)
+            node.addChild(attr_value, self.train(new_data, attribute_index_list))
         return node
 
     def entropy(self, list, class_set):
