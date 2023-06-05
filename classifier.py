@@ -37,12 +37,10 @@ class Classifier:
 
         if len(attribute_index_list) == 1:
             class_count_list = []
-            for clas in self.dataset.attributes[0]:
-                count = 0
-                for elem in data:
-                    if elem[0] == clas:
-                        count += 1
-                class_count_list.append((clas, count))
+            for class_ in self.dataset.attributes[0]:
+                class_column = [row[0] for row in data] 
+                count = class_column.count(class_)
+                class_count_list.append((class_, count))
             best_class = max(class_count_list, key=lambda x: x[1])
             return Node(best_class[0])
 
