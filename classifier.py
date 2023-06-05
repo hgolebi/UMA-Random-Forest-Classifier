@@ -40,16 +40,13 @@ class Classifier:
             class_column = [row[0] for row in data]
             counter = Counter(class_column)
             best_class = counter.most_common(1)[0][0]
-            return Node(best_class[0])
+            return Node(best_class)
 
         attr_id = self.bestAttribute(data, attribute_index_list)
         attribute_index_list.remove(attr_id)
         node = Node(attr_id)
         for attr_value in self.dataset.attributes[attr_id]:
-            new_data = []
-            for row in data:
-                if row[attr_id] == attr_value:
-                    new_data.append(row)
+            new_data = [row for row in data if row[attr_id] == attr_value]
             node.addChild(attr_value, self.train(new_data, attribute_index_list))
         return node
 
