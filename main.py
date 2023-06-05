@@ -8,8 +8,8 @@ class1 = ('e', 'p')
 data2 = "breast-cancer.data"
 class2 = ("recurrence-events", "no-recurrence-events")
 
-DATA = data2
-CLASS = class2
+DATA = data1
+CLASS = class1
 
 d = Dataset(DATA)
 c = Classifier(d)

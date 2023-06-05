@@ -3,14 +3,12 @@ from random import randrange, shuffle
 class Dataset:
     def __init__(self, filename):
         self.data = None
-        self.attribute_list = None
-        self.attribute_count = None
+        self.attributes = None
         self.training_set = None
         self.training_size = None
         self.test_set = None
         self.test_size = None
         self.readFromFile(filename)
-        self.divideDataset()
         self.createAtributeSets()
 
     def readFromFile(self, filename):
@@ -26,7 +24,6 @@ class Dataset:
         for row in rows:
             self.data.append(row.split(","))
         self.size = len(self.data)
-        self.attribute_count = len(self.data[0])
 
         self.test_set = self.data[:(self.size // 5)]
         self.training_set = self.data[(self.size // 5):]
@@ -34,12 +31,12 @@ class Dataset:
         self.test_size = len(self.test_set)
 
     def createAtributeSets(self):
-        self.attribute_list = []
-        for i in range(self.attribute_count):
+        self.attributes = []
+        for i in range((len(self.data[0]))):
             newset = set()
             for elem in self.data:
                 newset.add(elem[i])
-            self.attribute_list.append(newset)
+            self.attributes.append(newset)
 
 
 
