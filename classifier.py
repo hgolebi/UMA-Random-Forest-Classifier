@@ -47,20 +47,19 @@ class Classifier:
             node.addChild(attr_value, self.train(new_data, attribute_index_list))
         return node
 
-    def entropy(self, list, class_set):
+    def entropy(self, list):
         entropy = 0
         class_column = [row[0] for row in list]
         for class_, count in Counter(class_column).items():
             if count != 0:
                 class_probability = count / len(list)
                 entropy -= class_probability * math.log(class_probability)
-
         return entropy
 
 
     def bestAttribute(self, data, attribute_index_list):
         infGainlist = [-1 for n in self.dataset.attributes]
-        entropy = self.entropy(data, self.dataset.attributes[0])
+        entropy = self.entropy(data)
         for index in attribute_index_list:
             infGain = entropy
             for value in self.dataset.attributes[index]:
@@ -68,7 +67,7 @@ class Classifier:
                 for elem in data:
                     if elem[index] == value:
                         new_data.append(elem)
-                infGain -= len(new_data) / len(data) * self.entropy(new_data, self.dataset.attributes[0])
+                infGain -= len(new_data) / len(data) * self.entropy(new_data)
             infGainlist[index] = infGain
         return max(attribute_index_list, key = lambda x: infGainlist[x])
 
