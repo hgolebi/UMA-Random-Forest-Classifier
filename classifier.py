@@ -2,6 +2,7 @@ from reprlib import recursive_repr
 from dataset import Dataset
 from collections import Counter
 import math
+import random
 
 class Node:
     def __init__(self, value = None):
@@ -27,10 +28,11 @@ class Classifier:
         if len(attribute_index_list) < 1:
             raise(Exception)
 
+        # Pierwsza kolumna w zbiorze danych, to kolumna zawierająca klasy
         class_column = [row[0] for row in data]
         
         # Sprawdzamy, czy w zbiorze została tylko 1 klasa
-        if all([elem == class_column[0] for elem in class_column]):
+        if all([class_ == class_column[0] for class_ in class_column]):
             return Node(class_column[0])
 
         # Jeżeli nie ma już atrybutów, zwracamy najczęstszą klasę
@@ -57,20 +59,17 @@ class Classifier:
         return entropy
 
 
-    def bestAttribute(self, data, attribute_index_list):
-        infGainlist = [-1 for n in self.dataset.attributes]
-        entropy = self.entropy(data)
-        for index in attribute_index_list:
-            infGain = entropy
-            for value in self.dataset.attributes[index]:
-                new_data = []
-                for elem in data:
-                    if elem[index] == value:
-                        new_data.append(elem)
-                infGain -= len(new_data) / len(data) * self.entropy(new_data)
-            infGainlist[index] = infGain
-        return max(attribute_index_list, key = lambda x: infGainlist[x])
+    def infGain(self, attr_index, data):
+        inf_list = []
+        for attr_value in self.dataset.attributes[attr_index]:
+            new_data = [row for row in data if row[attr_index] == attr_value]
+            inf_list.append(len(new_data) / len(data) * self.entropy(new_data))
+        return self.entropy(data) - sum(inf_list)
 
+
+    def bestAttribute(self, data, attribute_index_list):
+        sample = random.sample(attribute_index_list, 2)
+        return max(sample, key=lambda attr: self.infGain(attr, data))
 
     def classify(self, object):
         curr_node = self.root
