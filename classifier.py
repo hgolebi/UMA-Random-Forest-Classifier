@@ -4,8 +4,8 @@ from collections import Counter
 import math
 
 class Node:
-    def __init__(self, value = None):
-        self.value = value
+    def __init__(self, attr_id = None):
+        self.attribute_index = attr_id
         self.children = {}
 
     def addChild(self, attribute_value, child_node):
@@ -75,16 +75,16 @@ class Classifier:
     def classify(self, object):
         curr_node = self.root
         while curr_node.children:
-            attr_index = curr_node.value
-            attr_val = object[attr_index]
-            curr_node = curr_node.children[attr_val]
-        return curr_node.value
+            attr_index = curr_node.attribute_index
+            attr_value = object[attr_index]
+            curr_node = curr_node.children[attr_value]
+        return curr_node.attribute_index
 
     def recursive_test(self, node):
         if not node.children:
             return True
 
-        attr_values = self.dataset.attributes[node.value]
+        attr_values = self.dataset.attributes[node.attribute_index]
 
         if len(node.children) != len(attr_values):
             return False
