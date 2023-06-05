@@ -29,15 +29,15 @@ class Classifier:
             raise(Exception)
 
         # Pierwsza kolumna w zbiorze danych, to kolumna zawierająca klasy
-        class_column = [row[0] for row in data]
+        calculated_classcolumn = [row[0] for row in data]
         
         # Sprawdzamy, czy w zbiorze została tylko 1 klasa
-        if all([class_ == class_column[0] for class_ in class_column]):
-            return Node(class_column[0])
+        if all([calculated_class == calculated_classcolumn[0] for calculated_class in calculated_classcolumn]):
+            return Node(calculated_classcolumn[0])
 
         # Jeżeli nie ma już atrybutów, zwracamy najczęstszą klasę
         if len(attribute_index_list) == 1:
-            counter = Counter(class_column)
+            counter = Counter(calculated_classcolumn)
             best_class = counter.most_common(1)[0][0]
             return Node(best_class)
 
@@ -52,10 +52,10 @@ class Classifier:
 
     def entropy(self, list):
         entropy = 0
-        class_column = [row[0] for row in list] 
-        for class_, count in Counter(class_column).items():
-            class_probability = count / len(list)
-            entropy -= class_probability * math.log(class_probability)
+        calculated_classcolumn = [row[0] for row in list] 
+        for calculated_class, count in Counter(calculated_classcolumn).items():
+            calculated_classprobability = count / len(list)
+            entropy -= calculated_classprobability * math.log(calculated_classprobability)
         return entropy
 
 
@@ -116,3 +116,24 @@ class RandomForest:
         return counter.most_common(1)[0][0]
 
 
+    def test(self):
+        classes = [cls for cls in self.dataset.attributes[0]]
+        tp = 0
+        tn = 0
+        fp = 0
+        fn = 0
+        for row in self.dataset.test_set:
+            calculated_class = self.classify(row)
+            real_class = row[0]
+            if calculated_class == classes[0] and real_class == classes[0]:
+                tp += 1
+            if calculated_class == classes[1] and real_class == classes[1]:
+                tn += 1
+            if calculated_class == classes[0] and real_class == classes[1]:
+                fp += 1
+            if calculated_class == classes[1] and real_class == classes[0]:
+                fn += 1
+
+        acc = (tp + tn) / len(self.dataset.test_set) * 100
+        prec = tp / (tp + fp) * 100
+        return (tp, tn, fp, fn)
