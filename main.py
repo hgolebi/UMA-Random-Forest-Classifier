@@ -1,12 +1,48 @@
 from classifier import Classifier, RandomForest
 from dataset import Dataset
 from sklearn.ensemble import RandomForestClassifier as ClassicRandomForest
+from tabulate import tabulate
 
 FILE = "agaricus-lepiota.data"
 class_set = ('e', 'p')
 dataset = Dataset(FILE)
 
-for trees_count in range (10, 101, 10):
+training_set, test_set = dataset.convertToNumbers()
+
+n = 10
+trainX = [row[1:] for row in training_set]
+trainY = [row[0] for row in training_set]
+testX = [row[1:] for row in test_set]
+testY = [row[0] for row in test_set]
+
+def create_table(method, column_list):
+    first_col = ['Trees', 'TP', 'TN', 'FP', 'FN', 'Acc%', 'Prec%']
+    table = tabulate([first_col] + column_list)
+    return(table)
+    
+
+
+def test_classic_implementation(trees_num, train_x, train_y, test_x, test_y, positive_val):
+    model = ClassicRandomForest(trees_num)
+    model.fit(train_x, train_y)
+    results = model.predict(test_x)
+
+    tp, tn, fp, fn = (0, 0, 0, 0)
+
+    for idx, result in enumerate(results):    
+        if result == positive_val and test_y[idx] == positive_val:
+            tp += 1
+        if result != positive_val and test_y[idx] != positive_val:
+            tn += 1
+        if result == positive_val and test_y[idx] != positive_val:
+            fp += 1
+        if result != positive_val and test_y[idx] == positive_val:
+            fn += 1
+
+    return (tp, tn, fp, fn)
+
+columns = []
+for trees_count in [1, 5, 10, 15]:
     tp, tn, fp, fn = (0, 0, 0, 0)
     for n in range(5):
         rf = RandomForest(dataset, trees_count)
@@ -17,53 +53,7 @@ for trees_count in range (10, 101, 10):
         fn += fn_
     acc = (tp + tn) / (tp + tn + fp + fn) * 100
     prec = tp / (tp + fp) * 100
-    print("TEST RESULTS FOR ", trees_count, ' TREES')
-    print("True Positive: ", tp)
-    print("True Negative: ", tn)
-    print("False Positive: ", fp)
-    print("False Negative: ", fn)
-    print("Accuracy: ", acc, "%")
-    print("Precision: ", prec, "%")
+    columns.append([trees_count, tp, tn, fp, fn, acc, prec])
+print(create_table('Our', columns))
 
-
-# n = 10
-# our_implementation = RandomForest(dataset, n)
-# classic_implementation = ClassicRandomForest(n)
-# trainX = [row[1:] for row in dataset.training_set]
-# trainY = [row[0] for row in dataset.training_set]
-# classic_implementation.fit(trainX, trainY)
-# testX = [row[1:] for row in dataset.test_set]
-# testY = [row[0] for row in dataset.test_set]
-# print(classic_implementation.score(testX, testY))
-
-# def test_classic_implementation():
-#     tp = 0
-#     tn = 0
-#     fp = 0
-#     fn = 0
-
-#     for elem in d.test_set:
-#         clas = c.classify(elem)
-#         real_class = elem[0]
-
-#         if clas == class_set[0] and real_class == class_set[0]:
-#             tp += 1
-
-#         if clas == class_set[1] and real_class == class_set[1]:
-#             tn += 1
-
-#         if clas == class_set[0] and real_class == class_set[1]:
-#             fp += 1
-
-#         if clas == class_set[1] and real_class == class_set[0]:
-#             fn += 1
-
-#     acc = (tp + tn) / len(d.test_set) * 100
-
-#     print("Tested data: ", DATA)
-#     # print("Test: ", c.test())
-#     print("True Positive: ", tp)
-#     print("True Negative: ", tn)
-#     print("False Positive: ", fp)
-#     print("False Negative: ", fn)
-#     print("Accuracy: ", acc, "%")
+# res = test_classic_implementation(3, trainX, trainY, testX, testY, ord('e'))

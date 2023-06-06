@@ -38,7 +38,16 @@ class Dataset:
                 newset.add(elem[i])
             self.attributes.append(newset)
 
-
+    def convertToNumbers(self):
+        new_train_data = []
+        new_test_data = []
+        for row in self.training_set:
+            new_row = [ord(value) for value in row]
+            new_train_data.append(new_row)
+        for row in self.test_set:
+            new_row = [ord(value) for value in row]
+            new_test_data.append(new_row)
+        return (new_train_data, new_test_data)
 
 d = Dataset("agaricus-lepiota.data")
 # d = Dataset("datatest.data")
