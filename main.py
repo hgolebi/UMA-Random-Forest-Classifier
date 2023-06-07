@@ -1,7 +1,7 @@
 from classifier import Classifier, RandomForest
 from dataset import Dataset
 from sklearn.ensemble import RandomForestClassifier as ClassicRandomForest
-from tabulate import tabulate
+from tabulate import tabulate, SEPARATING_LINE
 
 FILE = "agaricus-lepiota.data"
 class_set = ('e', 'p')
@@ -15,12 +15,13 @@ trainY = [row[0] for row in training_set]
 testX = [row[1:] for row in test_set]
 testY = [row[0] for row in test_set]
 
-def create_table(method, column_list):
+
+def create_table(column_list):
     first_col = ['Trees', 'TP', 'TN', 'FP', 'FN', 'Acc%', 'Prec%']
-    table = tabulate([first_col] + column_list)
+    flist = zip(*([first_col] + column_list))
+    table = tabulate(flist, tablefmt='simple_grid', numalign='right')
     return(table)
     
-
 
 def test_classic_implementation(trees_num, train_x, train_y, test_x, test_y, positive_val):
     model = ClassicRandomForest(trees_num)
@@ -41,19 +42,42 @@ def test_classic_implementation(trees_num, train_x, train_y, test_x, test_y, pos
 
     return (tp, tn, fp, fn)
 
-columns = []
+def calculate_results(result_table):
+    tp, tn, fp, fn = result_table
+    acc = (tp + tn) / (tp + tn + fp + fn) * 100
+    prec = tp / (tp + fp) * 100
+    acc = round(acc, 2)
+    prec = round(prec, 2)
+    return acc, prec
+
+our = []
+classic = []
 for trees_count in [1, 5, 10, 15]:
     tp, tn, fp, fn = (0, 0, 0, 0)
+    TP, TN, FP, FN = (0, 0, 0, 0)
     for n in range(5):
+        TP_, TN_, FP_, FN_ = test_classic_implementation(trees_count, trainX, trainY, testX, testY, ord(class_set[0]))
+        TP += TP_
+        TN += TN_
+        FP += FP_
+        FN += FN_
+
         rf = RandomForest(dataset, trees_count)
         tp_, tn_, fp_, fn_ = rf.test()
         tp += tp_
         tn += tn_
         fp += fp_
         fn += fn_
-    acc = (tp + tn) / (tp + tn + fp + fn) * 100
-    prec = tp / (tp + fp) * 100
-    columns.append([trees_count, tp, tn, fp, fn, acc, prec])
-print(create_table('Our', columns))
+    acc, prec = calculate_results((tp, tn, fp, fn))
+    our.append([trees_count, tp, tn, fp, fn, acc, prec])
+
+    ACC, PREC = calculate_results((TP, TN, FP, FN))
+    classic.append([trees_count, TP, TN, FP, FN, ACC, PREC])
+
+print('OUR IMPLEMENTATION')    
+print(create_table(our))
+
+print('CLASSIC IMPLEMENTATION')    
+print(create_table(classic))
 
 # res = test_classic_implementation(3, trainX, trainY, testX, testY, ord('e'))
