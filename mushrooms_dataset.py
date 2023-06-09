@@ -1,6 +1,8 @@
+# autorzy: Hubert Gołębiowski, Jakub Rozkosz
+
 from random import randrange, shuffle
 
-class Dataset:
+class MushroomsDataset:
     def __init__(self, filename):
         self.data = None
         self.attributes = None
@@ -49,7 +51,7 @@ class Dataset:
             new_test_data.append(new_row)
         return (new_train_data, new_test_data)
 
-d = Dataset("agaricus-lepiota.data")
+d = MushroomsDataset("agaricus-lepiota.data")
 # d = Dataset("datatest.data")
 pass
 

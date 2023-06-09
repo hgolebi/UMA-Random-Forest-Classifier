@@ -1,5 +1,6 @@
+# autorzy: Hubert Gołębiowski, Jakub Rozkosz
+
 from reprlib import recursive_repr
-from dataset import Dataset
 from collections import Counter
 import math
 import random
@@ -134,6 +135,6 @@ class RandomForest:
             if calculated_class == classes[1] and real_class == classes[0]:
                 fn += 1
 
-        acc = (tp + tn) / len(self.dataset.test_set) * 100
-        prec = tp / (tp + fp) * 100
+        # acc = (tp + tn) / len(self.dataset.test_set) * 100
+        # prec = tp / (tp + fp) * 100
         return (tp, tn, fp, fn)
