@@ -67,7 +67,6 @@ def run_tests(trainX, trainY, testX, testY, dataset, class_set):
 
     return our, classic
 
-# res = test_classic_implementation(3, trainX, trainY, testX, testY, ord('e'))
 
 if __name__ == "__main__":
     FILE = "agaricus-lepiota.data"
