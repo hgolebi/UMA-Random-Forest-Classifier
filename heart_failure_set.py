@@ -34,12 +34,13 @@ class HeartDataset:
     def readFromFile(self, filename):
         with open(filename, 'r') as file:
             reader = csv.reader(file)
+            header = next(reader)
             for line in reader:
-                # shuffle(rows)
                 self.data.append(line)
+        shuffle(self.data)
         self.size = len(self.data)
 
-        self.test_set = self.data[1:(self.size // 5)]
+        self.test_set = self.data[:(self.size // 5)]
         self.training_set = self.data[(self.size // 5):]
         self.training_size = len(self.training_set)
         self.test_size = len(self.test_set)

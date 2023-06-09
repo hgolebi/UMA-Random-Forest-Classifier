@@ -43,7 +43,7 @@ def calculate_results(result_table):
 def run_tests(trainX, trainY, testX, testY, dataset, class_set):
     our = []
     classic = []
-    for trees_count in [1, 5, 10, 15, 30]:
+    for trees_count in [1, 5, 10, 15]:
         tp, tn, fp, fn = (0, 0, 0, 0)
         TP, TN, FP, FN = (0, 0, 0, 0)
         for n in range(5):
