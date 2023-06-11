@@ -117,13 +117,14 @@ class RandomForest:
         return counter.most_common(1)[0][0]
 
 
-    def test(self):
+    def test(self, train=False):
         classes = [cls for cls in self.dataset.attributes[0]]
         tp = 0
         tn = 0
         fp = 0
         fn = 0
-        for row in self.dataset.test_set:
+        dataset = self.dataset.training_set if train else self.dataset.test_set
+        for row in dataset:
             calculated_class = self.classify(row)
             real_class = row[0]
             if calculated_class == classes[0] and real_class == classes[0]:
