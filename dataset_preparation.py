@@ -3,7 +3,7 @@
 from random import randrange, shuffle
 import csv
 
-class HeartDataset:
+class Dataset:
     def __init__(self, filename, shift_done=True):
         self.data = []
         self.attributes = None
@@ -85,7 +85,7 @@ class HeartDataset:
             new_dataset.append(new_row)
         return new_dataset
 
-d = HeartDataset("heart.csv", True)
+d = Dataset("agaricus-lepiota.csv", True)
 
 pass
 

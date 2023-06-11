@@ -1,8 +1,7 @@
 # autorzy: Hubert Gołębiowski, Jakub Rozkosz
 
 from classifier import Classifier, RandomForest
-from mushrooms_dataset import MushroomsDataset
-from heart_failure_set import HeartDataset
+from dataset_preparation import Dataset
 from sklearn.ensemble import RandomForestClassifier as ClassicRandomForest
 from tabulate import tabulate, SEPARATING_LINE
 
@@ -67,13 +66,11 @@ def run_tests(trainX, trainY, testX, testY, dataset, class_set, tests_on_trainin
 
     return our, classic
 
+def run_all(dataset_file, class_set, tests_on_training_set=False):
+    mushrooms_dataset = Dataset(dataset_file)
 
-if __name__ == "__main__":
-    FILE = "agaricus-lepiota.data"
-    class_set_mushrooms = (ord('e'), ord('p'))
-    mushrooms_dataset = MushroomsDataset(FILE)
-
-    mush_training_set, mush_test_set = mushrooms_dataset.convertToNumbers()
+    mush_training_set = mushrooms_dataset.convertToNumbers(mushrooms_dataset.training_set)
+    mush_test_set = mushrooms_dataset.convertToNumbers(mushrooms_dataset.test_set)
 
     n = 10
     mush_trainX = [row[1:] for row in mush_training_set]
@@ -81,37 +78,20 @@ if __name__ == "__main__":
     mush_testX = [row[1:] for row in mush_test_set]
     mush_testY = [row[0] for row in mush_test_set]
 
-    our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set_mushrooms)
-    print('OUR IMPLEMENTATION on mushrooms test dataset')    
+    our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set, tests_on_training_set)
+    test_dataset_type = 'test' if tests_on_training_set else 'training'
+    print(f'OUR IMPLEMENTATION on mushrooms {test_dataset_type} dataset')    
     print(create_table(our))
-    print('CLASSIC IMPLEMENTATION on mushrooms test dataset')    
+    print(f'CLASSIC IMPLEMENTATION on mushrooms {test_dataset_type} dataset')    
     print(create_table(classic))
 
 
-    FILE = "heart.csv"
-    class_set_heart = (0.0, 1.0)
-    heart_dataset = HeartDataset(FILE)
+if __name__ == "__main__":
+    run_all("agaricus-lepiota.csv", (1.0, 2.0))
 
-    heart_training_set = heart_dataset.convertToNumbers(heart_dataset.training_set)
-    heart_test_set = heart_dataset.convertToNumbers(heart_dataset.test_set)
-
-    # n = 10
-    heart_trainX = [row[1:] for row in heart_training_set]
-    heart_trainY = [row[0] for row in heart_training_set]
-    heart_testX = [row[1:] for row in heart_test_set]
-    heart_testY = [row[0] for row in heart_test_set]
-
-    our, classic = run_tests(heart_trainX, heart_trainY, heart_testX, heart_testY, heart_dataset, class_set_heart)
-    print('OUR IMPLEMENTATION on heart failure test dataset')    
-    print(create_table(our))
-    print('CLASSIC IMPLEMENTATION on heart failure test dataset')    
-    print(create_table(classic))
+    run_all("heart.csv", (0.0, 1.1))
 
     # checking if there has been an overfitting
+    run_all("agaricus-lepiota.csv", (1.0, 2.0), True)
+    run_all("heart.csv", (0.0, 1.0), True)
 
-    our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set_mushrooms, True)
-    print('OUR IMPLEMENTATION on mushrooms training dataset')    
-    print(create_table(our))
-    our, classic = run_tests(heart_trainX, heart_trainY, heart_testX, heart_testY, heart_dataset, class_set_heart, True)
-    print('OUR IMPLEMENTATION on heart failure training dataset')    
-    print(create_table(our))
