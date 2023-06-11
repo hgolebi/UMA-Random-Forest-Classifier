@@ -8,18 +8,18 @@ import random
 class Node:
     def __init__(self, value = None):
         self.value = value  # Jezeli wezel ma dzieci, to value = indeks atrybutu decyzyjnego,
-                            # jesli nie ma dzieci, to value = klasa    
+                            # jesli nie ma dzieci, to value = klasa
         self.children = {}
 
     def addChild(self, attribute_value, child_node):
         self.children[attribute_value] = child_node
- 
+
 
 class Classifier:
     def __init__(self, dataset):
         self.dataset = dataset
         attribute_index_list = list(range(1, len(dataset.attributes)))
-        self.root = self.train(dataset.data, attribute_index_list)
+        self.root = self.train(dataset.training_set, attribute_index_list)
 
 
     def train(self, data, attribute_index_list):
@@ -31,7 +31,7 @@ class Classifier:
 
         # Pierwsza kolumna w zbiorze danych, to kolumna zawierająca klasy
         calculated_classcolumn = [row[0] for row in data]
-        
+
         # Sprawdzamy, czy w zbiorze została tylko 1 klasa
         if all([calculated_class == calculated_classcolumn[0] for calculated_class in calculated_classcolumn]):
             return Node(calculated_classcolumn[0])
@@ -53,7 +53,7 @@ class Classifier:
 
     def entropy(self, list):
         entropy = 0
-        calculated_classcolumn = [row[0] for row in list] 
+        calculated_classcolumn = [row[0] for row in list]
         for calculated_class, count in Counter(calculated_classcolumn).items():
             calculated_classprobability = count / len(list)
             entropy -= calculated_classprobability * math.log(calculated_classprobability)
@@ -110,7 +110,7 @@ class RandomForest:
         self.trees = []
         for i in range(count):
             self.trees.append(Classifier(dataset))
-        
+
     def classify(self, object):
         decisions = [tree.classify(object) for tree in self.trees]
         counter = Counter(decisions)
