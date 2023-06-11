@@ -80,16 +80,16 @@ def run_all(dataset_file, class_set, tests_on_training_set=False):
 
     our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set, tests_on_training_set)
     test_dataset_type = 'test' if tests_on_training_set else 'training'
-    print(f'OUR IMPLEMENTATION on mushrooms {test_dataset_type} dataset')    
+    print(f'OUR IMPLEMENTATION on {dataset_file} {test_dataset_type} dataset')    
     print(create_table(our))
-    print(f'CLASSIC IMPLEMENTATION on mushrooms {test_dataset_type} dataset')    
+    print(f'CLASSIC IMPLEMENTATION on {dataset_file} {test_dataset_type} dataset')    
     print(create_table(classic))
 
 
 if __name__ == "__main__":
     run_all("agaricus-lepiota.csv", (1.0, 2.0))
 
-    run_all("heart.csv", (0.0, 1.1))
+    run_all("heart.csv", (0.0, 1.0))
 
     # checking if there has been an overfitting
     run_all("agaricus-lepiota.csv", (1.0, 2.0), True)
