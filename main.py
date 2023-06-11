@@ -40,7 +40,7 @@ def calculate_results(result_table):
     prec = round(prec, 2)
     return acc, prec
 
-def run_tests(trainX, trainY, testX, testY, dataset, class_set):
+def run_tests(trainX, trainY, testX, testY, dataset, class_set, tests_on_training_set=False):
     our = []
     classic = []
     for trees_count in [1, 5, 10, 15]:
@@ -54,7 +54,7 @@ def run_tests(trainX, trainY, testX, testY, dataset, class_set):
             FN += FN_
 
             rf = RandomForest(dataset, trees_count)
-            tp_, tn_, fp_, fn_ = rf.test()
+            tp_, tn_, fp_, fn_ = rf.test(tests_on_training_set)
             tp += tp_
             tn += tn_
             fp += fp_
@@ -82,9 +82,9 @@ if __name__ == "__main__":
     mush_testY = [row[0] for row in mush_test_set]
 
     our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set_mushrooms)
-    print('OUR IMPLEMENTATION on mushrooms dataset')    
+    print('OUR IMPLEMENTATION on mushrooms test dataset')    
     print(create_table(our))
-    print('CLASSIC IMPLEMENTATION on mushrooms dataset')    
+    print('CLASSIC IMPLEMENTATION on mushrooms test dataset')    
     print(create_table(classic))
 
 
@@ -102,7 +102,16 @@ if __name__ == "__main__":
     heart_testY = [row[0] for row in heart_test_set]
 
     our, classic = run_tests(heart_trainX, heart_trainY, heart_testX, heart_testY, heart_dataset, class_set_heart)
-    print('OUR IMPLEMENTATION on heart failure dataset')    
+    print('OUR IMPLEMENTATION on heart failure test dataset')    
     print(create_table(our))
-    print('CLASSIC IMPLEMENTATION on heart failure dataset')    
+    print('CLASSIC IMPLEMENTATION on heart failure test dataset')    
     print(create_table(classic))
+
+    # checking if there has been an overfitting
+
+    our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set_mushrooms, True)
+    print('OUR IMPLEMENTATION on mushrooms training dataset')    
+    print(create_table(our))
+    our, classic = run_tests(heart_trainX, heart_trainY, heart_testX, heart_testY, heart_dataset, class_set_heart, True)
+    print('OUR IMPLEMENTATION on heart failure training dataset')    
+    print(create_table(our))
