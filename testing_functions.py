@@ -41,7 +41,7 @@ def calculate_results(result_table):
 
 def run_tests_on_own(dataset, num_of_iters, tests_on_training_set=False):
     results = []
-    for trees_count in [1, 5, 10, 25, 50, 100, 150]:
+    for trees_count in [1, 5, 10, 25, 50, 100, 200, 500]:
         tp, tn, fp, fn = (0, 0, 0, 0)
         for n in range(num_of_iters):
             rf = RandomForest(dataset, trees_count)
@@ -58,7 +58,7 @@ def run_tests_on_own(dataset, num_of_iters, tests_on_training_set=False):
 
 def run_tests_on_classic(trainX, trainY, testX, testY, class_set, num_of_iters):
     results = []
-    for trees_count in [1, 5, 10, 25, 50, 100, 150]:
+    for trees_count in [1, 5, 10, 25, 50, 100, 200, 500]:
         tp, tn, fp, fn = (0, 0, 0, 0)
         for n in range(num_of_iters):
             tp_, tn_, fp_, fn_ = test_classic_implementation(trees_count, trainX, trainY, testX, testY, class_set[0])
@@ -71,7 +71,7 @@ def run_tests_on_classic(trainX, trainY, testX, testY, class_set, num_of_iters):
 
     return results
 
-def run_all(dataset, class_set, num_of_iters, tests_on_training_set=False):
+def run_all(dataset, class_set, num_of_iters, tests_on_training_set=False, just_run_own=False):
     training_set = dataset.convertToNumbers(dataset.training_set)
     test_set = dataset.convertToNumbers(dataset.test_set)
 
@@ -81,11 +81,11 @@ def run_all(dataset, class_set, num_of_iters, tests_on_training_set=False):
     testY = [row[0] for row in test_set]
 
     test_dataset_type = 'test' if not tests_on_training_set else 'training'
-    classic = run_tests_on_classic(trainX, trainY, testX, testY, class_set, num_of_iters)
-    print(f'CLASSIC IMPLEMENTATION on {dataset.filename} {test_dataset_type} dataset')    
-    print(create_table(classic, dataset.division_size))
-    if tests_on_training_set:
-        return 
     our = run_tests_on_own(dataset, num_of_iters, tests_on_training_set)
     print(f'OUR IMPLEMENTATION on {dataset.filename} {test_dataset_type} dataset')
     print(create_table(our, dataset.division_size))
+    if just_run_own:
+        return
+    classic = run_tests_on_classic(trainX, trainY, testX, testY, class_set, num_of_iters)
+    print(f'CLASSIC IMPLEMENTATION on {dataset.filename} {test_dataset_type} dataset')    
+    print(create_table(classic, dataset.division_size))

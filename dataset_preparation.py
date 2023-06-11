@@ -42,9 +42,9 @@ class Dataset:
         shuffle(self.data)
         self.size = len(self.data)
 
-        div_size = int(1 / self.division_size)
-        self.test_set = self.data[:(self.size // div_size)]
-        self.training_set = self.data[(self.size // div_size):]
+        division_index = int(self.size * self.division_size)
+        self.training_set = self.data[division_index:]
+        self.test_set = self.data[:division_index]
         self.training_size = len(self.training_set)
         self.test_size = len(self.test_set)
 
