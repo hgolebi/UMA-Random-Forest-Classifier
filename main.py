@@ -39,19 +39,11 @@ def calculate_results(result_table):
     prec = round(prec, 2)
     return acc, prec
 
-def run_tests(trainX, trainY, testX, testY, dataset, class_set, tests_on_training_set=False):
-    our = []
-    classic = []
+def run_tests_on_own(dataset, num_of_iters, tests_on_training_set=False):
+    results = []
     for trees_count in [1, 5, 10, 15]:
         tp, tn, fp, fn = (0, 0, 0, 0)
-        TP, TN, FP, FN = (0, 0, 0, 0)
-        for n in range(5):
-            TP_, TN_, FP_, FN_ = test_classic_implementation(trees_count, trainX, trainY, testX, testY, class_set[0])
-            TP += TP_
-            TN += TN_
-            FP += FP_
-            FN += FN_
-
+        for n in range(num_of_iters):
             rf = RandomForest(dataset, trees_count)
             tp_, tn_, fp_, fn_ = rf.test(tests_on_training_set)
             tp += tp_
@@ -59,39 +51,66 @@ def run_tests(trainX, trainY, testX, testY, dataset, class_set, tests_on_trainin
             fp += fp_
             fn += fn_
         acc, prec = calculate_results((tp, tn, fp, fn))
-        our.append([trees_count, tp, tn, fp, fn, acc, prec])
+        results.append([trees_count, tp, tn, fp, fn, acc, prec])
 
-        ACC, PREC = calculate_results((TP, TN, FP, FN))
-        classic.append([trees_count, TP, TN, FP, FN, ACC, PREC])
+    return results
 
-    return our, classic
 
-def run_all(dataset_file, class_set, tests_on_training_set=False):
-    mushrooms_dataset = Dataset(dataset_file)
+def run_tests_on_classic(trainX, trainY, testX, testY, class_set, num_of_iters):
+    results = []
+    for trees_count in [1, 5, 10, 15]:
+        tp, tn, fp, fn = (0, 0, 0, 0)
+        for n in range(num_of_iters):
+            tp_, tn_, fp_, fn_ = test_classic_implementation(trees_count, trainX, trainY, testX, testY, class_set[0])
+            tp += tp_
+            tn += tn_
+            fp += fp_
+            fn += fn_
+        acc, prec = calculate_results((tp, tn, fp, fn))
+        results.append([trees_count, tp, tn, fp, fn, acc, prec])
 
-    mush_training_set = mushrooms_dataset.convertToNumbers(mushrooms_dataset.training_set)
-    mush_test_set = mushrooms_dataset.convertToNumbers(mushrooms_dataset.test_set)
+    return results
 
-    n = 10
-    mush_trainX = [row[1:] for row in mush_training_set]
-    mush_trainY = [row[0] for row in mush_training_set]
-    mush_testX = [row[1:] for row in mush_test_set]
-    mush_testY = [row[0] for row in mush_test_set]
+def run_all(dataset, class_set, num_of_iters, tests_on_training_set=False):
+    training_set = dataset.convertToNumbers(dataset.training_set)
+    test_set = dataset.convertToNumbers(dataset.test_set)
 
-    our, classic = run_tests(mush_trainX, mush_trainY, mush_testX, mush_testY, mushrooms_dataset, class_set, tests_on_training_set)
-    test_dataset_type = 'test' if tests_on_training_set else 'training'
-    print(f'OUR IMPLEMENTATION on {dataset_file} {test_dataset_type} dataset')    
-    print(create_table(our))
-    print(f'CLASSIC IMPLEMENTATION on {dataset_file} {test_dataset_type} dataset')    
+    trainX = [row[1:] for row in training_set]
+    trainY = [row[0] for row in training_set]
+    testX = [row[1:] for row in test_set]
+    testY = [row[0] for row in test_set]
+
+    test_dataset_type = 'test' if not tests_on_training_set else 'training'
+    classic = run_tests_on_classic(trainX, trainY, testX, testY, class_set, num_of_iters)
+    print(f'CLASSIC IMPLEMENTATION on {dataset.filename} {test_dataset_type} dataset')    
     print(create_table(classic))
+    if tests_on_training_set:
+        return 
+    our = run_tests_on_own(dataset, num_of_iters, tests_on_training_set)
+    print(f'OUR IMPLEMENTATION on {dataset.filename} {test_dataset_type} dataset')
+    print(create_table(our))
 
 
 if __name__ == "__main__":
-    run_all("agaricus-lepiota.csv", (1.0, 2.0))
-
-    run_all("heart.csv", (0.0, 1.0))
+    # comparing results of predictions for classic and own implementation
+    # - running for different numbers of trees
+    mushrooms_dataset = Dataset("agaricus-lepiota.csv", 0.2)
+    run_all(mushrooms_dataset, ('e', 'p'), 5)
+    print("mushrooms done")
+    heart_dataset = Dataset("heart.csv", 0.2)
+    run_all(heart_dataset, ('0.0', '1.0'), 5)
+    print("heart done")
 
     # checking if there has been an overfitting
-    run_all("agaricus-lepiota.csv", (1.0, 2.0), True)
-    run_all("heart.csv", (0.0, 1.0), True)
+    run_all(mushrooms_dataset, ('e', 'p'), 5, True)
+    run_all(heart_dataset, (0.0, 1.0), 5, True)
 
+    # checking an impact on results of different dataset division size (training/test set)
+    dataset20to80 = Dataset("agaricus-lepiota.csv", 0.2)
+    run_all(dataset20to80, ('e', 'p'), 5)
+    dataset30to70 = Dataset("agaricus-lepiota.csv", 0.3)
+    run_all(dataset30to70, ('e', 'p'), 5)
+    dataset40to60 = Dataset("agaricus-lepiota.csv", 0.4)
+    run_all(dataset40to60, ('e', 'p'), 5)
+    dataset50to50 = Dataset("agaricus-lepiota.csv", 0.5)
+    run_all(dataset50to50, ('e', 'p'), 5)

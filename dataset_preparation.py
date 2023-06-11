@@ -4,7 +4,9 @@ from random import randrange, shuffle
 import csv
 
 class Dataset:
-    def __init__(self, filename, shift_done=True):
+    def __init__(self, filename, division_size, shift_done=True, class_column=-1):
+        self.filename = filename
+        self.division_size = division_size
         self.data = []
         self.attributes = None
         self.training_set = None
@@ -12,19 +14,19 @@ class Dataset:
         self.test_set = None
         self.test_size = None
         if not shift_done:
-            self.shift_class_column_to_first(filename)
+            self.shift_class_column_to_first(filename, class_column)
         self.readFromFile(filename)
         self.unique_values = self.count_unique_values(filename)
         self.column_names = list(self.unique_values.keys())
         self.createAtributeSets()
-    
-    def shift_class_column_to_first(self, filename):
+
+    def shift_class_column_to_first(self, filename, class_column=-1):
             with open(filename, 'r') as file:
                 reader = csv.reader(file)
                 rows = list(reader)
 
             for row in rows:
-                last_column = row.pop(-1)
+                last_column = row.pop(class_column)
                 row.insert(0, last_column)
 
             with open(filename, 'w', newline='') as file:
@@ -40,8 +42,9 @@ class Dataset:
         shuffle(self.data)
         self.size = len(self.data)
 
-        self.test_set = self.data[:(self.size // 5)]
-        self.training_set = self.data[(self.size // 5):]
+        div_size = int(1 / self.division_size)
+        self.test_set = self.data[:(self.size // div_size)]
+        self.training_set = self.data[(self.size // div_size):]
         self.training_size = len(self.training_set)
         self.test_size = len(self.test_set)
 
@@ -52,7 +55,7 @@ class Dataset:
             for elem in self.data:
                 newset.add(elem[i])
             self.attributes.append(newset)
-    
+
     def count_unique_values(self, filename):
         unique_values = {}
 
@@ -68,12 +71,12 @@ class Dataset:
                     unique_values[column_name].add(value)
 
         return unique_values
-    
+
     def convertToNumbers(self, dataset):
         new_dataset = []
         for row in dataset:
-            new_row = []
-            for value, col_name in zip(row, self.column_names):
+            new_row = [row[0]]
+            for value, col_name in zip(row[1:], self.column_names[1:]):
                 try:
                     value = float(value)
                 except ValueError:
@@ -84,8 +87,3 @@ class Dataset:
                 new_row.append(value)
             new_dataset.append(new_row)
         return new_dataset
-
-d = Dataset("agaricus-lepiota.csv", True)
-
-pass
-
